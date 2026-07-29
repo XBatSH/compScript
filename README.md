@@ -43,7 +43,8 @@ sweep and the two classic combinatorial optimizers.
 - Decomposable (pairwise) Lennard-Jones packing energy
 - **Dead-End Elimination** (Goldstein criterion) and **simulated annealing**
 - Tutorial: [English](rotamer/Rotamer_tutorial.md) ·
-  [中文](rotamer/Rotamer_tutorial_zh.md)
+  [中文](rotamer/Rotamer_tutorial_zh.md) ·
+[Notebook](rotamer/Rotamer_tutorial.ipynb)
 
 ```bash
 cd rotamer
