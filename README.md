@@ -62,7 +62,8 @@ conformations fit the same ends, so candidates are ranked by energy.
 - Multi-start closure ranked by a coarse backbone energy (Lennard-Jones +
   Ramachandran)
 - Tutorial: [English](kinematics_loop/Kinematics_loop_tutorial.md) ·
-  [中文](kinematics_loop/Kinematics_loop_tutorial_zh.md)
+  [中文](kinematics_loop/Kinematics_loop_tutorial_zh.md) ·
+[Notebook](kinematics_loop/Kinematics_loop_tutorial.ipynb)
 
 ```bash
 cd kinematics_loop
@@ -78,7 +79,8 @@ pip install -r requirements.txt
 ```
 
 Requires Python 3.10+ (the code uses `X | None` type syntax). RDKit is needed by
-`GaussianShape/` and `rotamer/`; `kinematics_loop/` needs only NumPy.
+`GaussianShape/` and `rotamer/`; `kinematics_loop/` needs only NumPy, plus
+Matplotlib for its notebook.
 
 Each module is self-contained — run its examples from inside that module's
 directory, since the demos add their own parent directory to `sys.path`.
