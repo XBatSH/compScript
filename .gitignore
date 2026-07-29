@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated demo artifacts -- rerun the examples to regenerate these.
+# (Tutorial figures under docs/images/ are intentionally NOT ignored,
+#  because the markdown tutorials embed them.)
+examples/output/
+**/examples/output/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
