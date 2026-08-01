@@ -71,7 +71,29 @@ cd kinematics_loop
 python examples/example_loop.py
 ```
 
-### 4. `QM_simple/` — Hartree–Fock from scratch
+### 4. `internal2cartesian/` — Cartesian ↔ internal coordinate conversion
+
+Implements the complete, lossless round-trip between Cartesian coordinates and
+internal coordinates (Z-matrix). Builds peptide backbones from ideal geometry
+plus user-specified φ/ψ torsions, propagates torsion changes via Rodrigues
+rotation, and extracts the full Z-matrix from Cartesian coordinates.
+
+- `Internal → Cartesian`: builds coordinates in 4 stages (origin, +z, xz-plane, NeRF)
+- `Cartesian → Internal`: extracts Z-matrix with intelligent reference-atom selection
+- Rodrigues' rotation formula for O(k) torsion propagation on the downstream slice
+- IUPAC ↔ NeRF sign convention and exact round-trip (RMSD = 0)
+- Peptide backbone building from φ/ψ with ideal Engh-Huber geometry
+- Tutorial: [English](internal2cartesian/TorsionPropagation_tutorial.md) ·
+  [中文](internal2cartesian/TorsionPropagation_tutorial_zh.md) ·
+  [Notebook](internal2cartesian/TorsionPropagation_tutorial.ipynb)
+
+```bash
+cd internal2cartesian
+python examples/example_peptide.py
+python examples/example_torsion_propagation.py
+```
+
+### 5. `QM_simple/` — Hartree–Fock from scratch
 
 A minimal restricted Hartree–Fock (RHF) implementation in pure Python. Given a
 molecule (from SMILES or from explicit atoms), it builds the STO-3G basis, computes
@@ -102,7 +124,7 @@ pip install -r requirements.txt
 
 Requires Python 3.10+ (the code uses `X | None` type syntax). RDKit is needed by
 `GaussianShape/`, `rotamer/`, and `QM_simple/` (for 3D geometry generation);
-`kinematics_loop/` needs only NumPy, plus Matplotlib for its notebook.
+`kinematics_loop/` and `internal2cartesian/` need only NumPy, plus Matplotlib for their notebooks.
 
 Each module is self-contained — run its examples from inside that module's
 directory, since the demos add their own parent directory to `sys.path`.
@@ -126,6 +148,9 @@ compScript/
 │   └── examples/
 ├── kinematics_loop/
 │   ├── core/            # geometry, backbone, ccd, energy
+│   └── examples/
+├── internal2cartesian/
+│   ├── core/            # convert.py: internal_to_cartesian, cartesian_to_internal, place_atom
 │   └── examples/
 └── QM_simple/
     ├── core/            # molecule, basis, integrals, scf
