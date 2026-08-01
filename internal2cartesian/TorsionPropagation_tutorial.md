@@ -11,19 +11,19 @@ formulas, diagrams, and the essential code.
 
 ## 1. Motivation: one torsion, many atoms
 
-You change the backbone \(\psi_2\) angle by +30°, or flip a side-chain \(\chi_1\) from -60°
+You change the backbone $\psi_2$ angle by +30°, or flip a side-chain $\chi_1$ from -60°
 to +60°. Intuitively you touched **one** degree of freedom, yet every atom from the
 rotation point onward moves — often by several angstroms. Why?
 
 The answer is that a molecule described by internal coordinates is a **serial kinematic
-chain**, and each torsion is a **revolute joint**. Rotating joint \(k\) rigidly rotates
-every link from \(k+1\) to the end of the chain. Understanding *which* atoms move and *by
+chain**, and each torsion is a **revolute joint**. Rotating joint $k$ rigidly rotates
+every link from $k+1$ to the end of the chain. Understanding *which* atoms move and *by
 how much* is essential for everything downstream:
 
 | Module | How it uses torsion propagation |
 |---|---|
 | `kinematics_loop/` | CCD closes loops by rotating the "downstream slice" one torsion at a time |
-| `rotamer/` | Setting a \(\chi\) angle rotates the rest of the side chain outward |
+| `rotamer/` | Setting a $\chi$ angle rotates the rest of the side chain outward |
 | `internal2cartesian/` | Forward kinematics: changing a Z-matrix dihedral shifts all later atoms |
 
 ---
@@ -32,67 +32,67 @@ how much* is essential for everything downstream:
 
 ### 2.1 Atoms A, B are stationary; C is the origin; everything after C rotates
 
-For any dihedral \(A-B-C-D\):
+For any dihedral $A-B-C-D$:
 
 - Atoms **A** and **B** are **fixed** — they sit before the rotation axis.
 - Atom **C** is the **origin** — it does not change position, but it anchors the axis.
-- The bond **\(B \rightarrow C\)** is the **rotation axis**.
+- The bond **$B \rightarrow C$** is the **rotation axis**.
 - Atom **D** and every atom reachable from D through bonds **rotate as a rigid block**
-  about the axis \(B \rightarrow C\).
+  about the axis $B \rightarrow C$.
 
 This is forward kinematics: atom D's position is defined by
 
-\[
+$$
 D = f(A, B, C,\; \text{bond},\; \text{angle},\; \tau)
-\]
+$$
 
-where \(\tau\) is the torsion. Change \(\tau\) and D moves. Any atom E that was defined
+where $\tau$ is the torsion. Change $\tau$ and D moves. Any atom E that was defined
 using D as one of its reference atoms (A, B, or C) will also move — even though E's
 *own* bond length, bond angle, and dihedral are unchanged — because its reference frame
 has been rotated.
 
 ### 2.2 The backbone as a kinematic chain
 
-A peptide backbone with atoms \([N_1, CA_1, C_1, N_2, CA_2, C_2, \ldots, N_L, CA_L, C_L]\)
+A peptide backbone with atoms $[N_1, CA_1, C_1, N_2, CA_2, C_2, \ldots, N_L, CA_L, C_L]$
 has two rotatable torsions per residue:
 
-\[
+$$
 \begin{aligned}
 \phi_i &= C_{i-1} - N_i - CA_i - C_i \quad &\text{rotates } C_i \text{ and everything after} \\
 \psi_i &= N_i - CA_i - C_i - N_{i+1} \quad &\text{rotates } N_{i+1} \text{ and everything after}
 \end{aligned}
-\]
+$$
 
 The **downstream slice** of a torsion is the list of atom indices that move when that
 torsion changes:
 
-\[
+$$
 \begin{aligned}
 \text{slice}(\phi_i) &= [\text{idx}(C_i),\; \ldots,\; \text{end}] \\
 \text{slice}(\psi_i) &= [\text{idx}(N_{i+1}),\; \ldots,\; \text{end}]
 \end{aligned}
-\]
+$$
 
-For a 5-residue backbone (15 atoms), rotating \(\psi_2\) moves the 9 atoms from \(N_3\)
-to \(C_5\); rotating \(\phi_3\) moves the 7 atoms from \(C_3\) to \(C_5\).
+For a 5-residue backbone (15 atoms), rotating $\psi_2$ moves the 9 atoms from $N_3$
+to $C_5$; rotating $\phi_3$ moves the 7 atoms from $C_3$ to $C_5$.
 
 ### 2.3 Side chains: the same physics
 
-Consider a lysine side chain: \(CA - CB - CG - CD - CE - NZ\). Each \(\chi\) angle is
+Consider a lysine side chain: $CA - CB - CG - CD - CE - NZ$. Each $\chi$ angle is
 a revolute joint:
 
-\[
+$$
 \begin{aligned}
 \chi_1 &= N-CA-CB-CG \quad &\text{rotates } CG, CD, CE, NZ \\
 \chi_2 &= CA-CB-CG-CD \quad &\text{rotates } CD, CE, NZ \\
 \chi_3 &= CB-CG-CD-CE \quad &\text{rotates } CE, NZ \\
 \chi_4 &= CG-CD-CE-NZ \quad &\text{rotates } NZ \text{ only}
 \end{aligned}
-\]
+$$
 
-Changing \(\chi_1\) moves 4 atoms; changing \(\chi_4\) moves only 1. This is why rotamer
-libraries store all \(\chi\) angles — the cumulative effect of changing \(\chi_1\) is
-much larger than changing \(\chi_4\), and rotamers are set from \(\chi_1\) outward so that
+Changing $\chi_1$ moves 4 atoms; changing $\chi_4$ moves only 1. This is why rotamer
+libraries store all $\chi$ angles — the cumulative effect of changing $\chi_1$ is
+much larger than changing $\chi_4$, and rotamers are set from $\chi_1$ outward so that
 inner rotations do not disturb already-placed outer angles.
 
 ---
@@ -138,33 +138,33 @@ All indices are 0-based, all angles are in radians. This is the format returned 
 
 ### 3.2 Internal → Cartesian: `internal_to_cartesian(entries)`
 
-Given a list of `ZMatrixEntry` in order (atom 1 to atom \(n\)), build Cartesian
+Given a list of `ZMatrixEntry` in order (atom 1 to atom $n$), build Cartesian
 coordinates. The algorithm proceeds in three stages:
 
 **Stage 1 — Atom 1 (origin):**
 
-\[
+$$
 \mathbf{r}_1 = (0, 0, 0)
-\]
+$$
 
 **Stage 2 — Atom 2 (along +z):**
 
-\[
+$$
 \mathbf{r}_2 = (0, 0, d_{12}), \quad d_{12} = \text{bond\_length of entry 1}
-\]
+$$
 
 **Stage 3 — Atom 3 (in xz-plane):**
 
-Given bond length \(d\) (entry 2's `bond_length`) and angle \(\alpha\) (entry 2's `angle`),
-atom 3 is placed so that the 1–2–3 bond angle equals \(\alpha\):
+Given bond length $d$ (entry 2's `bond_length`) and angle $\alpha$ (entry 2's `angle`),
+atom 3 is placed so that the 1–2–3 bond angle equals $\alpha$:
 
-\[
+$$
 \mathbf{r}_3 = \big(d \sin\alpha,\; 0,\; d_{12} - d \cos\alpha\big)
-\]
+$$
 
-**Stage 4 — Atoms 4 through \(n\) (NeRF):**
+**Stage 4 — Atoms 4 through $n$ (NeRF):**
 
-For each remaining atom \(k\), look up its three reference atoms:
+For each remaining atom $k$, look up its three reference atoms:
 
 ```python
 a = coords[entry.dihedral_with - 1]   # A (1-based → 0-based)
@@ -172,7 +172,7 @@ b = coords[entry.angle_with - 1]      # B
 c = coords[entry.bond_to - 1]         # C
 ```
 
-Then place atom \(k\) via the NeRF construction (see Section 5.1). The full code
+Then place atom $k$ via the NeRF construction (see Section 5.1). The full code
 (`convert.py` lines 150–195):
 
 ```python
@@ -201,8 +201,8 @@ have a *smaller* index than the current atom. This guarantees a valid build orde
 Given a list of `(symbol, x, y, z)` tuples and optionally a bond graph, extract the
 Z-matrix. This is the *inverse* of `internal_to_cartesian`:
 
-1. For each atom \(i\) (in order), determine its three **reference atoms** among the
-   already-processed atoms \(j < i\).
+1. For each atom $i$ (in order), determine its three **reference atoms** among the
+   already-processed atoms $j < i$.
 2. Measure the geometric quantities from the Cartesian coordinates: bond length to
    `bond_to`, bond angle with `angle_with`, and dihedral with `dihedral_with`.
 
@@ -220,7 +220,7 @@ This prioritises chemically meaningful references (bonds) while gracefully falli
 to geometric proximity — essential for compact structures like helices where nearest-atom
 heuristics alone would pick the wrong partners.
 
-The geometric extraction for atom \(i \ge 4\):
+The geometric extraction for atom $i \ge 4$:
 
 ```python
 b_idx, a_idx, d_idx = _pick_references(coords, i, bonded_preceding[i])
@@ -283,28 +283,28 @@ handled consistently.
 ## 4. Method 1: Direct Cartesian rotation (Rodrigues)
 
 When you already have Cartesian coordinates and only want to change one torsion,
-Rodrigues rotation is the most efficient approach — \(O(k)\) where \(k\) is the number of
+Rodrigues rotation is the most efficient approach — $O(k)$ where $k$ is the number of
 downstream atoms, with no rebuild of the rest of the molecule.
 
 ### 4.1 The formula
 
-Given a rotation axis \(\hat{\mathbf{k}}\) (unit vector), an origin point \(\mathbf{o}\),
-and an angle \(\theta\), Rodrigues' rotation formula rigidly rotates any point
-\(\mathbf{r}\) to \(\mathbf{r}'\):
+Given a rotation axis $\hat{\mathbf{k}}$ (unit vector), an origin point $\mathbf{o}$,
+and an angle $\theta$, Rodrigues' rotation formula rigidly rotates any point
+$\mathbf{r}$ to $\mathbf{r}'$:
 
-\[
+$$
 \mathbf{r}' = \mathbf{o} + (\mathbf{r} - \mathbf{o})\cos\theta
             + \big[\hat{\mathbf{k}} \times (\mathbf{r} - \mathbf{o})\big]\sin\theta
             + \hat{\mathbf{k}}\big[\hat{\mathbf{k}} \cdot (\mathbf{r} - \mathbf{o})\big](1 - \cos\theta)
-\]
+$$
 
 ### 4.2 Applying a torsion change on the backbone
 
-To change \(\psi_i\) by \(\Delta\theta\):
+To change $\psi_i$ by $\Delta\theta$:
 
-1. Identify the rotation axis: the bond \(CA_i \rightarrow C_i\).
-2. The origin is atom \(C_i\).
-3. The downstream slice starts at \(N_{i+1}\).
+1. Identify the rotation axis: the bond $CA_i \rightarrow C_i$.
+2. The origin is atom $C_i$.
+3. The downstream slice starts at $N_{i+1}$.
 4. Apply Rodrigues rotation to `coords[slice_start:]`.
 
 ```python
@@ -323,7 +323,7 @@ RDKit's `SetDihedralDeg` does internally.
 
 ### 4.3 For side chains
 
-To change \(\chi_1\) of a lysine:
+To change $\chi_1$ of a lysine:
 
 ```python
 # χ₁ = N–CA–CB–CG
@@ -341,10 +341,10 @@ toward the backbone.
 
 ### 5.1 The NeRF construction
 
-Given three placed atoms \(A, B, C\) and the geometric parameters for atom \(D\), the
+Given three placed atoms $A, B, C$ and the geometric parameters for atom $D$, the
 **Natural Extension Reference Frame** (NeRF) algorithm places D in one step:
 
-\[
+$$
 \begin{aligned}
 \hat{\mathbf{bc}} &= \frac{\mathbf{c} - \mathbf{b}}{\lVert\mathbf{c} - \mathbf{b}\rVert}, \qquad
 \hat{\mathbf{n}} = \frac{(\mathbf{b} - \mathbf{a}) \times \hat{\mathbf{bc}}}{\lVert\cdots\rVert}, \qquad
@@ -352,17 +352,17 @@ Given three placed atoms \(A, B, C\) and the geometric parameters for atom \(D\)
 \mathbf{d}_\text{local} &= \big(-\ell\cos\theta,\;\; \ell\sin\theta\cos\tau,\;\; \ell\sin\theta\sin\tau\big), \qquad
 \mathbf{D} = \mathbf{c} + \mathbf{M}\,\mathbf{d}_\text{local}
 \end{aligned}
-\]
+$$
 
-where \(\ell = |C-D|\), \(\theta = \angle(B, C, D)\), and \(\tau\) is the dihedral
-\(A-B-C-D\). The matrix \(\mathbf{M}\) is an orthonormal frame: \(\hat{\mathbf{bc}}\)
-points along the bond, \(\hat{\mathbf{n}}\) is the plane normal from A-B-C, and
-\(\hat{\mathbf{n}} \times \hat{\mathbf{bc}}\) completes the right-handed frame.
+where $\ell = |C-D|$, $\theta = \angle(B, C, D)$, and $\tau$ is the dihedral
+$A-B-C-D$. The matrix $\mathbf{M}$ is an orthonormal frame: $\hat{\mathbf{bc}}$
+points along the bond, $\hat{\mathbf{n}}$ is the plane normal from A-B-C, and
+$\hat{\mathbf{n}} \times \hat{\mathbf{bc}}$ completes the right-handed frame.
 
 ### 5.2 Changing a torsion in the Z-matrix
 
 1. Find the Z-matrix entry of the atom whose dihedral you want to change.
-2. Update its `dihedral` field by \(\Delta\theta\).
+2. Update its `dihedral` field by $\Delta\theta$.
 3. Rebuild Cartesian coordinates from that entry onward using `internal_to_cartesian`.
 
 ```python
@@ -372,7 +372,7 @@ coords = internal_to_cartesian(entries)
 # Atoms 0–7 are rebuilt identically; atoms 8..N shift.
 ```
 
-All atoms with index \(\geq\) the changed entry get new positions because each
+All atoms with index $\geq$ the changed entry get new positions because each
 subsequent `place_atom` call sees rotated reference atoms. The result is mathematically
 identical to Method 1 — NeRF and Rodrigues are equivalent operations expressed in
 different coordinate systems.
@@ -383,7 +383,7 @@ different coordinate systems.
 
 | Scenario | Recommended method |
 |---|---|
-| You have Cartesian coords; tweak one torsion | Method 1 (Rodrigues) — \(O(k)\) per change, no rebuild |
+| You have Cartesian coords; tweak one torsion | Method 1 (Rodrigues) — $O(k)$ per change, no rebuild |
 | You're doing inverse kinematics (CCD loop closure) | Method 1 — the `kinematics_loop` module uses this |
 | You're building geometry from scratch with ideal bond lengths/angles | Method 2 (Z-matrix) — ensures ideal geometry |
 | You want to extract internal coordinates from a PDB | `cartesian_to_internal` (Section 3.3) |
@@ -399,26 +399,26 @@ different coordinate systems.
 
 The `LoopBackbone.apply_rotation(kind, i, theta)` method is a direct implementation of
 Method 1. During one CCD sweep, every torsion is visited and the downstream slice is
-rotated by the analytic optimal angle \(\theta^* = \operatorname{atan2}(c, b)\). The
+rotated by the analytic optimal angle $\theta^* = \operatorname{atan2}(c, b)$. The
 `downstream_slice(kind, i)` property returns exactly the slice described in Section 2.2.
 
 ### 7.2 `rotamer/` — side-chain packing
 
 `Peptide.set_chi(resnum, chi_index, angle_deg)` calls RDKit's
 `SetDihedralDeg(conf, a, b, c, d, angle)`, which internally finds all atoms downstream
-of atom `c` via bond traversal and rotates them by \(\Delta\theta\) using Rodrigues'
-formula. The `set_rotamer` method sets chi angles from \(\chi_1\) outward precisely
+of atom `c` via bond traversal and rotates them by $\Delta\theta$ using Rodrigues'
+formula. The `set_rotamer` method sets chi angles from $\chi_1$ outward precisely
 because of the propagation logic described in Section 2.3.
 
 ### 7.3 `internal2cartesian/` — conversion and peptide building
 
-- `build_peptide_from_internal` walks down the backbone using NeRF, with \(\phi, \psi\)
+- `build_peptide_from_internal` walks down the backbone using NeRF, with $\phi, \psi$
   as the only variable parameters and ideal bond lengths/angles as constants.
 - `cartesian_to_internal` extracts the Z-matrix from any molecule given its atom order
   and bond graph.
 - `internal_to_cartesian` rebuilds Cartesian coordinates from any valid Z-matrix.
 - `extract_backbone_internal` is a peptide-specific shortcut that returns all bond
-  lengths, angles, and dihedrals (\(\phi, \psi, \omega\)) in a structured format.
+  lengths, angles, and dihedrals ($\phi, \psi, \omega$) in a structured format.
 
 ---
 
@@ -492,16 +492,16 @@ Run from the `internal2cartesian/` directory:
 python examples/example_torsion_propagation.py
 ```
 
-It builds a penta-alanine (\(\alpha\)-helix, \(\phi=-57^\circ, \psi=-47^\circ\)), then:
+It builds a penta-alanine ($\alpha$-helix, $\phi=-57^\circ, \psi=-47^\circ$), then:
 
-1. **Rotates \(\psi_2\) by +30°** — shows that atoms 0–5 (\(N_1 \ldots C_2\)) are
-   stationary while atoms 6–14 (\(N_3 \ldots C_5\)) all move by up to several angstroms.
-2. **Rotates \(\phi_3\) by +30°** — shows a smaller downstream block (atoms 8–14, i.e.
-   \(C_3 \ldots C_5\)) moves while the entire N-terminal half is frozen.
+1. **Rotates $\psi_2$ by +30°** — shows that atoms 0–5 ($N_1 \ldots C_2$) are
+   stationary while atoms 6–14 ($N_3 \ldots C_5$) all move by up to several angstroms.
+2. **Rotates $\phi_3$ by +30°** — shows a smaller downstream block (atoms 8–14, i.e.
+   $C_3 \ldots C_5$) moves while the entire N-terminal half is frozen.
 3. **Verifies torsion invariance**: extracts all dihedrals before and after, confirming
    that only the target torsion changed.
 
-Typical output (displacement magnitudes for \(\psi_2\) rotation):
+Typical output (displacement magnitudes for $\psi_2$ rotation):
 
 | atom | index | displacement (Å) | moved? |
 |---|---|---|---|
@@ -526,10 +526,10 @@ python examples/example_peptide.py
 
 This demonstrates the complete round-trip:
 
-1. Builds an \(\alpha\)-helix from \(\phi, \psi\) angles (`internal → Cartesian`).
+1. Builds an $\alpha$-helix from $\phi, \psi$ angles (`internal → Cartesian`).
 2. Extracts the Z-matrix from Cartesian coordinates (`Cartesian → internal`).
 3. Rebuilds Cartesian from the Z-matrix (`internal → Cartesian`), verifying RMSD = 0.
-4. Extracts all internal coordinates (bonds, angles, \(\phi/\psi/\omega\)) and compares
+4. Extracts all internal coordinates (bonds, angles, $\phi/\psi/\omega$) and compares
    the helix with an extended strand.
 5. Confirms that input torsions exactly match extracted torsions.
 
@@ -554,7 +554,7 @@ This demonstrates the complete round-trip:
 |---|---|---|
 | `peptide_ideal_geometry` | `() → dict` | Standard backbone bond lengths & angles |
 | `build_peptide_from_internal` | `(seq, phi_deg, psi_deg, omega_deg=180) → (coords, names)` | Build backbone from torsions |
-| `extract_backbone_internal` | `(coords) → InternalCoords` | Extract \(\phi, \psi, \omega\) from backbone |
+| `extract_backbone_internal` | `(coords) → InternalCoords` | Extract $\phi, \psi, \omega$ from backbone |
 
 ### Torsion propagation (from example)
 
@@ -577,16 +577,16 @@ This demonstrates the complete round-trip:
 1. **Round-trip on an arbitrary molecule**: take the SDF of ethanol, build a Z-matrix
    with `cartesian_to_internal`, change one dihedral, rebuild with
    `internal_to_cartesian`. Verify that only the downstream atoms moved.
-2. **Larger \(\Delta\theta\)**: rotate \(\psi_2\) by 180°. Plot displacement vs atom
+2. **Larger $\Delta\theta$**: rotate $\psi_2$ by 180°. Plot displacement vs atom
    index — the curve traces a circle whose radius is the distance from the rotation axis.
-3. **Cumulative effects**: change \(\psi_2\) by +30° *and* \(\phi_3\) by -30° on the same
+3. **Cumulative effects**: change $\psi_2$ by +30° *and* $\phi_3$ by -30° on the same
    structure. Does the final displacement equal the sum of the individual displacements?
    (No — rotations in 3D do not commute.)
 4. **Reference atom selection**: run `cartesian_to_internal` on a helix with and without
    providing the bond graph. How does the Z-matrix differ? Which reference atoms are
    chosen in each case?
-5. **Omega perturbation**: rotate the peptide bond (\(\omega\)) by 30°. How many atoms
-   move? Why is \(\omega\) usually held at 180°?
+5. **Omega perturbation**: rotate the peptide bond ($\omega$) by 30°. How many atoms
+   move? Why is $\omega$ usually held at 180°?
 6. **Rodrigues vs NeRF equivalence**: change a torsion via Method 1, then independently
    change the same torsion in the Z-matrix and rebuild via Method 2. Verify RMSD = 0
    to within floating-point precision.

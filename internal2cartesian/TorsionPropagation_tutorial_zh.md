@@ -8,11 +8,11 @@
 
 ## 1. 动机：一个扭转角，许多原子
 
-你把主链 \(\psi_2\) 角改变 +30°，或者把侧链 \(\chi_1\) 从 -60° 翻转到 +60°。直觉上你只
+你把主链 $\psi_2$ 角改变 +30°，或者把侧链 $\chi_1$ 从 -60° 翻转到 +60°。直觉上你只
 动了一个自由度，但从旋转点开始，每个原子都移动了——通常达数埃。为什么？
 
 答案是：由内坐标描述的分子是一个**串联运动链**，每个扭转角是一个**旋转关节**。转动
-关节 \(k\) 会刚性地旋转从 \(k+1\) 到链末端的每一个链节：
+关节 $k$ 会刚性地旋转从 $k+1$ 到链末端的每一个链节：
 
 | 模块 | 如何使用扭转传播 |
 |---|---|
@@ -26,60 +26,60 @@
 
 ### 2.1 原子 A、B 固定；C 是原点；C 之后的一切都旋转
 
-对于任意二面角 \(A-B-C-D\)：
+对于任意二面角 $A-B-C-D$：
 
 - 原子 **A** 和 **B** 是**固定的**——它们位于旋转轴之前。
 - 原子 **C** 是**原点**——其位置不变，但锚定了旋转轴。
-- 键 **\(B \rightarrow C\)** 是**旋转轴**。
+- 键 **$B \rightarrow C$** 是**旋转轴**。
 - 原子 **D** 以及从 D 出发通过键可达的所有原子，作为一个**刚性块**绕轴旋转。
 
 这是正向运动学：原子 D 的位置由下式定义
 
-\[
+$$
 D = f(A, B, C,\; \text{bond},\; \text{angle},\; \tau)
-\]
+$$
 
 改变 τ，D 就移动。任何将 D 用作其参考原子之一的原子 E 也会移动——即使 E *自身*的
 键长、键角和二面角都未改变——因为其参考框架被旋转了。
 
 ### 2.2 主链作为运动链
 
-多肽主链 \([N_1, CA_1, C_1, N_2, CA_2, C_2, \ldots, N_L, CA_L, C_L]\) 每个残基有
+多肽主链 $[N_1, CA_1, C_1, N_2, CA_2, C_2, \ldots, N_L, CA_L, C_L]$ 每个残基有
 两个可旋转扭转角：
 
-\[
+$$
 \begin{aligned}
 \phi_i &= C_{i-1} - N_i - CA_i - C_i \quad &\text{旋转 } C_i \text{ 及其后所有原子} \\
 \psi_i &= N_i - CA_i - C_i - N_{i+1} \quad &\text{旋转 } N_{i+1} \text{ 及其后所有原子}
 \end{aligned}
-\]
+$$
 
 **下游切片**是该扭转角改变时发生移动的原子索引列表：
 
-\[
+$$
 \begin{aligned}
 \text{slice}(\phi_i) &= [\text{idx}(C_i),\; \ldots,\; \text{末端}] \\
 \text{slice}(\psi_i) &= [\text{idx}(N_{i+1}),\; \ldots,\; \text{末端}]
 \end{aligned}
-\]
+$$
 
-5 残基主链（15 原子）中，旋转 \(\psi_2\) 移动 9 个原子（\(N_3\) 到 \(C_5\)）；
-旋转 \(\phi_3\) 移动 7 个原子（\(C_3\) 到 \(C_5\)）。
+5 残基主链（15 原子）中，旋转 $\psi_2$ 移动 9 个原子（$N_3$ 到 $C_5$）；
+旋转 $\phi_3$ 移动 7 个原子（$C_3$ 到 $C_5$）。
 
 ### 2.3 侧链同理
 
-赖氨酸侧链 \(CA - CB - CG - CD - CE - NZ\)：每个 χ 角都是一个旋转关节。
+赖氨酸侧链 $CA - CB - CG - CD - CE - NZ$：每个 χ 角都是一个旋转关节。
 
-\[
+$$
 \begin{aligned}
 \chi_1 &= N-CA-CB-CG \quad &\text{旋转 } CG, CD, CE, NZ \\
 \chi_2 &= CA-CB-CG-CD \quad &\text{旋转 } CD, CE, NZ \\
 \chi_3 &= CB-CG-CD-CE \quad &\text{旋转 } CE, NZ \\
 \chi_4 &= CG-CD-CE-NZ \quad &\text{仅旋转 } NZ
 \end{aligned}
-\]
+$$
 
-改变 \(\chi_1\) 移动 4 个原子，改变 \(\chi_4\) 仅移动 1 个。因此 rotamer 从 \(\chi_1\)
+改变 $\chi_1$ 移动 4 个原子，改变 $\chi_4$ 仅移动 1 个。因此 rotamer 从 $\chi_1$
 向外设置，使内层旋转不扰动已放置的外层角。
 
 ---
@@ -123,32 +123,32 @@ class InternalCoords:
 
 ### 3.2 内坐标 → 笛卡尔：`internal_to_cartesian(entries)`
 
-给定按顺序排列的 `ZMatrixEntry` 列表（原子 1 到 \(n\)），构建笛卡尔坐标。算法分四步：
+给定按顺序排列的 `ZMatrixEntry` 列表（原子 1 到 $n$），构建笛卡尔坐标。算法分四步：
 
 **第 1 步 — 原子 1（原点）：**
 
-\[
+$$
 \mathbf{r}_1 = (0, 0, 0)
-\]
+$$
 
 **第 2 步 — 原子 2（沿 +z 轴）：**
 
-\[
+$$
 \mathbf{r}_2 = (0, 0, d_{12}), \quad d_{12} = \text{entry 1 的 bond\_length}
-\]
+$$
 
 **第 3 步 — 原子 3（在 xz 平面内）：**
 
-给定键长 \(d\)（entry 2 的 `bond_length`）和键角 \(\alpha\)（entry 2 的 `angle`），
-放置原子 3 使 1–2–3 键角等于 \(\alpha\)：
+给定键长 $d$（entry 2 的 `bond_length`）和键角 $\alpha$（entry 2 的 `angle`），
+放置原子 3 使 1–2–3 键角等于 $\alpha$：
 
-\[
+$$
 \mathbf{r}_3 = \big(d \sin\alpha,\; 0,\; d_{12} - d \cos\alpha\big)
-\]
+$$
 
-**第 4 步 — 原子 4 至 \(n\)（NeRF）：**
+**第 4 步 — 原子 4 至 $n$（NeRF）：**
 
-对每个剩余原子 \(k\)，查找其三个参考原子：
+对每个剩余原子 $k$，查找其三个参考原子：
 
 ```python
 a = coords[entry.dihedral_with - 1]   # A（1 起始 → 0 起始）
@@ -156,7 +156,7 @@ b = coords[entry.angle_with - 1]      # B
 c = coords[entry.bond_to - 1]         # C
 ```
 
-然后通过 NeRF 构造放置原子 \(k\)（见第 5.1 节）。完整代码
+然后通过 NeRF 构造放置原子 $k$（见第 5.1 节）。完整代码
 （`convert.py` 第 150–195 行）：
 
 ```python
@@ -185,7 +185,7 @@ def internal_to_cartesian(entries):
 给定 `(symbol, x, y, z)` 元组列表以及（可选的）键图，提取 Z-matrix。这是
 `internal_to_cartesian` 的**逆运算**：
 
-1. 对每个原子 \(i\)（按顺序），在已处理原子 \(j < i\) 中选择三个**参考原子**。
+1. 对每个原子 $i$（按顺序），在已处理原子 $j < i$ 中选择三个**参考原子**。
 2. 从笛卡尔坐标测量几何量：到 `bond_to` 的键长，与 `angle_with` 的键角，以及与
    `dihedral_with` 的二面角。
 
@@ -201,7 +201,7 @@ def internal_to_cartesian(entries):
 这优先选择有化学意义的参考原子（键），同时优雅地退回到几何邻近性——对螺旋等紧凑
 结构至关重要，因为仅用最近原子启发式会选择错误的配对。
 
-原子 \(i \ge 4\) 的几何提取：
+原子 $i \ge 4$ 的几何提取：
 
 ```python
 b_idx, a_idx, d_idx = _pick_references(coords, i, bonded_preceding[i])
@@ -257,26 +257,26 @@ dihedral_with=d_idx, dihedral=-dih                   # 测得的二面角取反
 
 ## 4. 方法一：直接笛卡尔旋转（Rodrigues）
 
-当你已有笛卡尔坐标且只想改变一个扭转角时，Rodrigues 旋转是最高效的方法——\(O(k)\)，
-其中 \(k\) 是下游原子数，无需重建分子其余部分。
+当你已有笛卡尔坐标且只想改变一个扭转角时，Rodrigues 旋转是最高效的方法——$O(k)$，
+其中 $k$ 是下游原子数，无需重建分子其余部分。
 
 ### 4.1 公式
 
-给定旋转轴 \(\hat{\mathbf{k}}\)（单位向量）、原点 \(\mathbf{o}\) 和角度 \(\theta\)：
+给定旋转轴 $\hat{\mathbf{k}}$（单位向量）、原点 $\mathbf{o}$ 和角度 $\theta$：
 
-\[
+$$
 \mathbf{r}' = \mathbf{o} + (\mathbf{r} - \mathbf{o})\cos\theta
             + \big[\hat{\mathbf{k}} \times (\mathbf{r} - \mathbf{o})\big]\sin\theta
             + \hat{\mathbf{k}}\big[\hat{\mathbf{k}} \cdot (\mathbf{r} - \mathbf{o})\big](1 - \cos\theta)
-\]
+$$
 
 ### 4.2 对主链施加扭转变化
 
-改变 \(\psi_i\) 即 \(\Delta\theta\)：
+改变 $\psi_i$ 即 $\Delta\theta$：
 
-1. 旋转轴：键 \(CA_i \rightarrow C_i\)
-2. 原点：原子 \(C_i\)
-3. 下游切片从 \(N_{i+1}\) 开始
+1. 旋转轴：键 $CA_i \rightarrow C_i$
+2. 原点：原子 $C_i$
+3. 下游切片从 $N_{i+1}$ 开始
 4. 对 `coords[slice_start:]` 应用 Rodrigues 旋转
 
 ```python
@@ -295,7 +295,7 @@ def apply_rotation(coords, axis_atom_a, axis_atom_b, slice_start, delta_rad):
 
 ### 4.3 侧链同理
 
-赖氨酸 \(\chi_1\)：
+赖氨酸 $\chi_1$：
 
 ```python
 # χ₁ = N–CA–CB–CG
@@ -311,10 +311,10 @@ apply_rotation(coords, idx_CA, idx_CB, slice_start=idx_CG, delta_rad)
 
 ### 5.1 NeRF 构造
 
-给定三个已放置原子 \(A, B, C\) 和原子 \(D\) 的几何参数，**自然延伸参考系**（NeRF）
+给定三个已放置原子 $A, B, C$ 和原子 $D$ 的几何参数，**自然延伸参考系**（NeRF）
 一步放置 D：
 
-\[
+$$
 \begin{aligned}
 \hat{\mathbf{bc}} &= \frac{\mathbf{c} - \mathbf{b}}{\lVert\mathbf{c} - \mathbf{b}\rVert}, \qquad
 \hat{\mathbf{n}} = \frac{(\mathbf{b} - \mathbf{a}) \times \hat{\mathbf{bc}}}{\lVert\cdots\rVert}, \qquad
@@ -322,16 +322,16 @@ apply_rotation(coords, idx_CA, idx_CB, slice_start=idx_CG, delta_rad)
 \mathbf{d}_\text{local} &= \big(-\ell\cos\theta,\;\; \ell\sin\theta\cos\tau,\;\; \ell\sin\theta\sin\tau\big), \qquad
 \mathbf{D} = \mathbf{c} + \mathbf{M}\,\mathbf{d}_\text{local}
 \end{aligned}
-\]
+$$
 
-其中 \(\ell = |C-D|\)，\(\theta = \angle(B, C, D)\)，\(\tau\) 为二面角 \(A-B-C-D\)。
-矩阵 \(\mathbf{M}\) 是正交框架：\(\hat{\mathbf{bc}}\) 沿键方向，\(\hat{\mathbf{n}}\) 是
-A-B-C 平面法向量，\(\hat{\mathbf{n}} \times \hat{\mathbf{bc}}\) 构成右手系。
+其中 $\ell = |C-D|$，$\theta = \angle(B, C, D)$，$\tau$ 为二面角 $A-B-C-D$。
+矩阵 $\mathbf{M}$ 是正交框架：$\hat{\mathbf{bc}}$ 沿键方向，$\hat{\mathbf{n}}$ 是
+A-B-C 平面法向量，$\hat{\mathbf{n}} \times \hat{\mathbf{bc}}$ 构成右手系。
 
 ### 5.2 在 Z-matrix 中改变一个扭转角
 
 1. 找到你想改变其二面角的原子对应的 Z-matrix 条目。
-2. 将其 `dihedral` 字段更新 \(\Delta\theta\)。
+2. 将其 `dihedral` 字段更新 $\Delta\theta$。
 3. 用 `internal_to_cartesian` 从该条目开始重建笛卡尔坐标。
 
 ```python
@@ -350,7 +350,7 @@ coords = internal_to_cartesian(entries)
 
 | 场景 | 推荐方法 |
 |---|---|
-| 已有笛卡尔坐标；微调一个扭转角 | 方法一（Rodrigues）——每次改变 \(O(k)\) |
+| 已有笛卡尔坐标；微调一个扭转角 | 方法一（Rodrigues）——每次改变 $O(k)$ |
 | 做逆运动学（CCD 环区闭合） | 方法一——`kinematics_loop` 模块即用此法 |
 | 用理想键长/键角从头构建几何结构 | 方法二（Z-matrix）——确保理想几何 |
 | 从 PDB 提取内坐标 | `cartesian_to_internal`（第 3.3 节） |
@@ -365,20 +365,20 @@ coords = internal_to_cartesian(entries)
 ### 7.1 `kinematics_loop/` — CCD 环区闭合
 
 `LoopBackbone.apply_rotation(kind, i, theta)` 是方法一的直接实现。一次 CCD 扫描中
-每个扭转角被访问，下游切片被 \(\theta^* = \operatorname{atan2}(c, b)\) 旋转。
+每个扭转角被访问，下游切片被 $\theta^* = \operatorname{atan2}(c, b)$ 旋转。
 
 ### 7.2 `rotamer/` — 侧链堆积
 
 `Peptide.set_chi(resnum, chi_index, angle_deg)` 调用 `SetDihedralDeg`，
-内部通过键遍历找到下游原子并用 Rodrigues 公式旋转。`set_rotamer` 从 \(\chi_1\) 向外
+内部通过键遍历找到下游原子并用 Rodrigues 公式旋转。`set_rotamer` 从 $\chi_1$ 向外
 设置正是基于第 2.3 节的传播逻辑。
 
 ### 7.3 `internal2cartesian/` — 转换与多肽构建
 
-- `build_peptide_from_internal`：用 NeRF 沿主链推进，\(\phi, \psi\) 为唯一可变参数。
+- `build_peptide_from_internal`：用 NeRF 沿主链推进，$\phi, \psi$ 为唯一可变参数。
 - `cartesian_to_internal`：从任意分子（给定原子顺序和键图）提取 Z-matrix。
 - `internal_to_cartesian`：从任意有效 Z-matrix 重建笛卡尔坐标。
-- `extract_backbone_internal`：多肽专用快捷函数，返回结构化格式的所有 \(\phi, \psi, \omega\)。
+- `extract_backbone_internal`：多肽专用快捷函数，返回结构化格式的所有 $\phi, \psi, \omega$。
 
 ---
 
@@ -450,13 +450,13 @@ psi_slice = idx_N(i + 1)  # 下游 = N_{i+1}, CA_{i+1}, C_{i+1}, ...
 python examples/example_torsion_propagation.py
 ```
 
-构建五丙氨酸 α-螺旋链（\(\phi=-57^\circ, \psi=-47^\circ\)），然后：
+构建五丙氨酸 α-螺旋链（$\phi=-57^\circ, \psi=-47^\circ$），然后：
 
-1. **将 \(\psi_2\) 旋转 +30°**——展示原子 0–5 不动，原子 6–14 全部移动。
-2. **将 \(\phi_3\) 旋转 +30°**——展示更小的下游块移动，N 端半部冻结。
+1. **将 $\psi_2$ 旋转 +30°**——展示原子 0–5 不动，原子 6–14 全部移动。
+2. **将 $\phi_3$ 旋转 +30°**——展示更小的下游块移动，N 端半部冻结。
 3. **验证扭转不变性**：提取变化前后的二面角，仅目标扭转角改变。
 
-\(\psi_2\) 旋转的典型输出：
+$\psi_2$ 旋转的典型输出：
 
 | 原子 | 索引 | 位移 (Å) | 移动? |
 |---|---|---|---|
@@ -476,7 +476,7 @@ python examples/example_peptide.py
 ```
 
 演示完整往返：
-1. 从 \(\phi, \psi\) 构建 α-螺旋（内坐标 → 笛卡尔）。
+1. 从 $\phi, \psi$ 构建 α-螺旋（内坐标 → 笛卡尔）。
 2. 从笛卡尔提取 Z-matrix（笛卡尔 → 内坐标）。
 3. 从 Z-matrix 重建笛卡尔（内坐标 → 笛卡尔），验证 RMSD = 0。
 4. 提取所有内坐标并对比螺旋与伸展链。
@@ -525,12 +525,12 @@ python examples/example_peptide.py
 
 1. **任意分子的往返**：取乙醇的 SDF，用 `cartesian_to_internal` 构建 Z-matrix，改变
    一个二面角，用 `internal_to_cartesian` 重建。验证仅下游原子移动。
-2. **更大的 Δθ**：将 \(\psi_2\) 旋转 180°。绘制位移对原子索引的图——曲线是什么形状？
-3. **累积效应**：将 \(\psi_2\) 改变 +30° *并*将 \(\phi_3\) 改变 -30°。最终位移等于各自
+2. **更大的 Δθ**：将 $\psi_2$ 旋转 180°。绘制位移对原子索引的图——曲线是什么形状？
+3. **累积效应**：将 $\psi_2$ 改变 +30° *并*将 $\phi_3$ 改变 -30°。最终位移等于各自
    位移之和吗？（否——三维旋转不可交换。）
 4. **参考原子选择**：对螺旋分别提供和不提供键图运行 `cartesian_to_internal`。
    Z-matrix 有何不同？各选了什么参考原子？
-5. **Omega 扰动**：将肽键（\(\omega\)）旋转 30°。多少原子移动？为何 \(\omega\) 通常
+5. **Omega 扰动**：将肽键（$\omega$）旋转 30°。多少原子移动？为何 $\omega$ 通常
    保持 180°？
 6. **Rodrigues vs NeRF 等价性**：用方法一改变一个扭转角，然后独立地在 Z-matrix 中
    改变同一扭转角并用方法二重建。验证 RMSD = 0。
