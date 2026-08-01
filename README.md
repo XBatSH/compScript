@@ -44,7 +44,7 @@ sweep and the two classic combinatorial optimizers.
 - **Dead-End Elimination** (Goldstein criterion) and **simulated annealing**
 - Tutorial: [English](rotamer/Rotamer_tutorial.md) ·
   [中文](rotamer/Rotamer_tutorial_zh.md) ·
-[Notebook](rotamer/Rotamer_tutorial.ipynb)
+  [Notebook](rotamer/Rotamer_tutorial.ipynb)
 
 ```bash
 cd rotamer
@@ -64,11 +64,32 @@ conformations fit the same ends, so candidates are ranked by energy.
   Ramachandran)
 - Tutorial: [English](kinematics_loop/Kinematics_loop_tutorial.md) ·
   [中文](kinematics_loop/Kinematics_loop_tutorial_zh.md) ·
-[Notebook](kinematics_loop/Kinematics_loop_tutorial.ipynb)
+  [Notebook](kinematics_loop/Kinematics_loop_tutorial.ipynb)
 
 ```bash
 cd kinematics_loop
 python examples/example_loop.py
+```
+
+### 4. `QM_simple/` — Hartree–Fock from scratch
+
+A minimal restricted Hartree–Fock (RHF) implementation in pure Python. Given a
+molecule (from SMILES or from explicit atoms), it builds the STO-3G basis, computes
+every molecular integral analytically, and self-consistently solves the Roothaan
+equations for the SCF orbitals. No quantum-chemistry library is used — every formula
+in the tutorial maps onto a short piece of real code.
+
+- STO-3G basis from contraction of Gaussian primitives
+- Boys function, McMurchie–Davidson / Obara–Saika integrals
+- Löwdin orthogonalisation, DIIS-accelerated SCF
+- Mulliken charges and a canonical MO diagram
+- Tutorial: [English](QM_simple/docs/TUTORIAL.md) ·
+  [中文](QM_simple/docs/TUTORIAL_zh.md) ·
+  [Notebook](QM_simple/docs/QM_simple_tutorial.ipynb)
+
+```bash
+cd QM_simple
+python examples/example_hf.py
 ```
 
 ---
@@ -80,8 +101,8 @@ pip install -r requirements.txt
 ```
 
 Requires Python 3.10+ (the code uses `X | None` type syntax). RDKit is needed by
-`GaussianShape/` and `rotamer/`; `kinematics_loop/` needs only NumPy, plus
-Matplotlib for its notebook.
+`GaussianShape/`, `rotamer/`, and `QM_simple/` (for 3D geometry generation);
+`kinematics_loop/` needs only NumPy, plus Matplotlib for its notebook.
 
 Each module is self-contained — run its examples from inside that module's
 directory, since the demos add their own parent directory to `sys.path`.
@@ -103,8 +124,11 @@ compScript/
 ├── rotamer/
 │   ├── core/            # peptide, residues, rotamer_lib, energy, search, optimize
 │   └── examples/
-└── kinematics_loop/
-    ├── core/            # geometry, backbone, ccd, energy
+├── kinematics_loop/
+│   ├── core/            # geometry, backbone, ccd, energy
+│   └── examples/
+└── QM_simple/
+    ├── core/            # molecule, basis, integrals, scf
     └── examples/
 ```
 
@@ -120,3 +144,7 @@ Each tutorial ends with its own reference list. The central papers:
   side-chain positioning.* Nature 1992, 356, 539-542.
 - Canutescu, A. A.; Dunbrack, R. L. *Cyclic coordinate descent: A robotics
   algorithm for protein loop closure.* Protein Science 2003, 12, 963-972.
+- Hehre, W. J. et al. *Ab initio molecular-orbital theory.* Prog. Phys. Chem.
+  1970 (the STO-3G basis set).
+- Szabo, A.; Ostlund, N. *Modern Quantum Chemistry*, 1996 — the standard
+  reference for restricted Hartree–Fock.
